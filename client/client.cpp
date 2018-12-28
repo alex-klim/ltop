@@ -11,7 +11,7 @@ static std::string UPTIME_FILE("/proc/uptime");
 static std::string LOADAVG_FILE("/proc/loadavg");
 static std::string MEMINFO_FILE("/proc/meminfo");
 
-
+constexpr int Client::timeDelta;
 
 void Client::uptime(double& upt, double& idt) const {
     std::ifstream ifs(UPTIME_FILE);
@@ -52,8 +52,8 @@ void Client::stat(cpu_info* cpus) const {
     }
 
     while (std::getline(ifs, line)) {
+        // not sure if that's portable
         if (line.find("cpu") != std::string::npos) {
-            std::cout << line << '\n';
             std::stringstream ss(line);
             ss.seekg(4);
             ss >> cpus[i].user;

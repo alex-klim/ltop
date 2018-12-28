@@ -1,7 +1,6 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-static constexpr int timeDelta = 1;
 using ull = unsigned long long;
 
 struct cpu_info {
@@ -10,6 +9,8 @@ struct cpu_info {
 
 class Client {
 public:
+    static constexpr int timeDelta = 3000;
+
     Client() = default;
     void uptime(double&, double&) const;
     void loadavg(double&, double&, double&, ull&) const;
