@@ -5,18 +5,25 @@
 
 #include <string>
 
+struct data {
+    int threads;
+    int running;
+    double load[3];
+    unsigned long long uptime;
+};
+
 class Ui {
 public:
     Ui() {};
 
     void init() const;
-    void drawHeader() const;
+    void drawHeader(data&) const;
     void drawSeparator(int) const;
     void drawProcList(int, int) const;
     void drawCpuLoad(int, int, int, int) const;
-    void drawSummary(int, int, int, int, double*, unsigned long long) const;
+    void drawSummary(int, int, data&) const;
     void drawString(int, int, std::string&) const;
-    void ui_loop() const;
+    void ui_loop(data&) const;
 
     static int w_height;
     static int w_width;

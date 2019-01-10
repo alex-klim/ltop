@@ -44,19 +44,18 @@ void Ui::drawString(int startx, int starty, std::string& msg) const {
     }
 }
 
-void Ui::drawSummary(int startx, int starty,
-        int threads, int running, double* lavg, unsigned long long uptime) const {
-    std::string buf = "Tasks: " + std::to_string(threads)
-        + ", " + std::to_string(running) +" running";
+void Ui::drawSummary(int startx, int starty, data& d) const {
+    std::string buf = "Tasks: " + std::to_string(d.threads)
+        + ", " + std::to_string(d.running) +" running";
     drawString(startx, starty, buf);
-    buf = "Load average: " + std::to_string(lavg[0]) + ", " + std::to_string(lavg[1])
-        + ", " + std::to_string(lavg[2]);
+    buf = "Load average: " + std::to_string(d.load[0]) + ", " + std::to_string(d.load[1])
+        + ", " + std::to_string(d.load[2]);
     drawString(startx, starty+1, buf);
-    buf = "Uptime: " + std::to_string(uptime);
+    buf = "Uptime: " + std::to_string(d.uptime);
     drawString(startx, starty+2, buf);
 }
 
-void Ui::drawHeader() const {
+void Ui::drawHeader(data& news) const {
     double arr[4];
     for (auto i = 0; i < 4; ++i) {
         arr[i] = i + i*30;
@@ -70,18 +69,14 @@ void Ui::drawHeader() const {
     }
     drawSeparator(starty+5);
 
-    static constexpr int threads = 240;
-    static constexpr int running = 1;
-    static double load[3] = {0.12, 0.25, 0.31};
-    static constexpr unsigned long long uptime = 12400;
-    drawSummary(max_width+5, 1, threads, running, load, uptime);
+    drawSummary(max_width+5, 1, news);
 }
 
-void Ui::ui_loop() const {
+void Ui::ui_loop(data& news) const {
     Ui::set_width();
     Ui::set_height();
     tb_clear();
-    drawHeader();
+    drawHeader(news);
     tb_present();
 
     struct tb_event ev;
@@ -98,7 +93,7 @@ void Ui::ui_loop() const {
                 Ui::set_height();
                 Ui::set_width();
                 tb_clear();
-                drawHeader();
+                drawHeader(news);
                 tb_present();
                 break;
         }

@@ -4,15 +4,18 @@
 #include <chrono>
 #include <thread>
 
-static constexpr int threads = 240;
-static constexpr int running = 1;
-static constexpr double load[3] = {0.12, 0.25, 0.31};
-static constexpr unsigned long long uptime = 12400;
+
 
 int main() {
+    data news{
+        240,
+        1,
+        {0.12, 0.25, 0.31},
+        12400
+    };
     Ui ui;
     ui.init();
-    ui.ui_loop();
+    ui.ui_loop(news);
     tb_present();
     tb_clear();
     tb_shutdown();
