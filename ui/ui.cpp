@@ -39,7 +39,7 @@ void Ui::drawSeparator(int y) const {
 }
 
 void Ui::drawString(int startx, int starty, std::string& msg) const {
-    for (auto i = 0; i < msg.length(); i++) {
+    for (size_t i = 0; i < msg.length(); i++) {
         tb_change_cell(startx+i, starty, msg[i], 151, 236);
     }
 }
@@ -72,12 +72,16 @@ void Ui::drawHeader(data& news) const {
     drawSummary(max_width+5, 1, news);
 }
 
-void Ui::ui_loop(data& news) const {
-    Ui::set_width();
-    Ui::set_height();
+void Ui::drawAll(data& news) const {
     tb_clear();
     drawHeader(news);
     tb_present();
+}
+
+void Ui::ui_loop(data& news) const {
+    Ui::set_width();
+    Ui::set_height();
+    drawAll(news);
 
     struct tb_event ev;
     while (tb_poll_event(&ev)) {
@@ -92,9 +96,7 @@ void Ui::ui_loop(data& news) const {
             case TB_EVENT_RESIZE:
                 Ui::set_height();
                 Ui::set_width();
-                tb_clear();
-                drawHeader(news);
-                tb_present();
+                drawAll(news);
                 break;
         }
     }

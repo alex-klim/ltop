@@ -5,11 +5,15 @@
 
 #include <string>
 
-struct data {
+using ull = unsigned long long;
+
+using data = struct {
+    ull uptime;
+    ull idle;
+    double load[3];
+    double usage[4];
     int threads;
     int running;
-    double load[3];
-    unsigned long long uptime;
 };
 
 class Ui {
@@ -23,6 +27,7 @@ public:
     void drawCpuLoad(int, int, int, int) const;
     void drawSummary(int, int, data&) const;
     void drawString(int, int, std::string&) const;
+    void drawAll(data&) const;
     void ui_loop(data&) const;
 
     static int w_height;

@@ -3,7 +3,7 @@
 
 using ull = unsigned long long;
 
-struct cpu_info {
+using cpu_info = struct {
     ull user, nice, system, idle, iowait, irq, sirq;
 };
 
@@ -13,7 +13,7 @@ public:
 
     Client() = default;
     void uptime(double&, double&) const;
-    void loadavg(double&, double&, double&, ull&) const;
+    void loadavg(double&, double&, double&, ull&, ull&) const;
     void stat(cpu_info*) const;
     void meminfo(ull&, ull&, ull&, ull&, ull&) const;
 };

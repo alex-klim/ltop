@@ -24,13 +24,13 @@ void calc_usage(cpu_info* lhs, cpu_info* rhs, double* usage) {
 int main() {
     Client client;
     double upt, idt, av1, av5, av15;
-    ull runnable, memtot, memfree, memav, stot, sfree;
+    ull runnable, exists, memtot, memfree, memav, stot, sfree;
     cpu_info* arr = new cpu_info[9];
     cpu_info* last = new cpu_info[9];
     double usage[4];
 
     client.uptime(upt, idt);
-    client.loadavg(av1, av5, av15, runnable);
+    client.loadavg(av1, av5, av15, runnable, exists);
     client.meminfo(memtot, memfree, memav, stot, sfree);
     client.stat(arr);
 

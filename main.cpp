@@ -2,10 +2,13 @@
 #include <iostream>
 #include <vector>
 
-#include "ui.hpp"
 #include "client.hpp"
+#include "ui.hpp"
 #include "app.hpp"
 
 int main() {
+    App app;
+    app.init();
+    app.main_loop();
     return 0;
 }

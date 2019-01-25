@@ -26,7 +26,7 @@ void Client::uptime(double& upt, double& idt) const {
 
 }
 
-void Client::loadavg(double& avg1, double& avg5, double& avg15, ull& run) const {
+void Client::loadavg(double& avg1, double& avg5, double& avg15, ull& run, ull& exists) const {
     std::ifstream ifs(LOADAVG_FILE);
 
     if(!ifs.is_open()) {
@@ -38,6 +38,7 @@ void Client::loadavg(double& avg1, double& avg5, double& avg15, ull& run) const 
     ifs >> avg5;
     ifs >> avg15;
     ifs >> run;
+    ifs >> exists;
 
 }
 
