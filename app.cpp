@@ -12,7 +12,7 @@ void cpu_cpy(cpu_info* lhs, cpu_info* rhs) {
     }
 }
 
-void calc_usage(cpu_info* lhs, cpu_info* rhs, double* usage) {
+void calc_usage(cpu_info* lhs, cpu_info* rhs, double usage[4]) {
     ull all;
     ull work;
     for (auto i = 1; i < 5; ++i) {
@@ -24,18 +24,24 @@ void calc_usage(cpu_info* lhs, cpu_info* rhs, double* usage) {
     }
 }
 
-App::App() {
-    gd = new ginfo;
-    md = new minfo;
+App::App() : gd(new ginfo()), md(new minfo()), cl(new Client()), ui(new Ui()) {
+    gd->last = new cpu_info[9]();
+    gd->cur = new cpu_info[9]();
 }
 
 App::~App() {
-    delete gd;
-    delete md;
+    delete gd->last;
+    delete gd->cur;
 }
 
 void App::init() {
+    ui->init();
     collect_data();
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+}
+
+void App::shutdown() {
+    ui->on_exit();
 }
 
 void App::collect_data() {
@@ -47,35 +53,38 @@ void App::collect_data() {
     calc_usage(gd->last, gd->cur, gd->usage);
 }
 
-void App::stat_loop() {
+int App::stat_loop() {
+    data news{
+        gd->uptime,
+        gd->idle,
+        { *(gd->load), *(gd->load+1), *(gd->load+2) },
+        { *(gd->usage), *(gd->usage+1), *(gd->usage+2), *(gd->usage+3) },
+        gd->threads,
+        gd->running
+    };
     while(1) {
         collect_data();
         {
             std::lock_guard<std::mutex> lock(d_mutex);
-            ui->drawAll(
-                    gd->uptime,
-                    gd->idle,
-                    gd->load,
-                    gd->usage,
-                    gd->threads,
-                    gd->running);
-                }
+            ui->drawAll(Point(1,2), news);
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(deltaTime));
     }
 }
 
-void App::main_loop() {
-    auto f = std::async(std::launch::async, stat_loop);
-    Ui::set_width();
-    Ui::set_height();
-    ui->drawAll({
-            gd->uptime,
-            gd->idle,
-            gd->load,
-            gd->usage,
-            gd->threads,
-            gd->running
-            });
+int App::main_loop() {
+    data news{
+        gd->uptime,
+        gd->idle,
+        { *(gd->load), *(gd->load+1), *(gd->load+2) },
+        { *(gd->usage), *(gd->usage+1), *(gd->usage+2), *(gd->usage+3) },
+        gd->threads,
+        gd->running
+    };
+    auto f = std::async(std::launch::async, &App::stat_loop, this);
+    ui->set_width();
+    ui->set_height();
+    ui->drawAll(Point(1,2), news);
 
     struct tb_event ev;
     while (tb_poll_event(&ev)) {
@@ -88,16 +97,9 @@ void App::main_loop() {
                 }
                 break;
             case TB_EVENT_RESIZE:
-                Ui::set_height();
-                Ui::set_width();
-                ui->drawAll({
-                    gd->uptime,
-                    gd->idle,
-                    gd->load,
-                    gd->usage,
-                    gd->threads,
-                    gd->running
-                });
+                ui->set_height();
+                ui->set_width();
+                ui->drawAll(Point(1,2), news);
                 break;
         }
         if (f.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
@@ -105,13 +107,13 @@ void App::main_loop() {
                 auto a = f.get();
             } catch (std::exception& e) {
                 std::cerr << "[client error]: " << e.what() <<'\n';
-                goto done;
+                return -1;
             }
             goto done;
         }
     }
 done:
-    return;
+    return 0;
 }
 
 #endif // APP_CPP

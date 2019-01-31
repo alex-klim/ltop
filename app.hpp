@@ -7,6 +7,7 @@
 #include <memory>
 #include <future>
 #include <mutex>
+#include <iostream>
 
 static constexpr int deltaTime = 3000; // milliseconds
 
@@ -18,7 +19,7 @@ struct minfo {
     ull sfree;
 };
 
-using ginfo = struct {
+struct ginfo {
     ull uptime;
     ull idle;
     double load[3];
@@ -42,13 +43,15 @@ public:
     App(const App&) = delete;
     App& operator=(const App&) = delete;
     void init();
+    void shutdown();
     void collect_data();
-    static void stat_loop();
-    void main_loop();
+    int stat_loop();
+    int main_loop();
 
 private:
-    static ginfo* gd;
-    static minfo* md;
+    std::unique_ptr<ginfo> gd;
+    std::unique_ptr<minfo> md;
+
     std::unique_ptr<Client> cl;
     std::unique_ptr<Ui> ui;
     std::mutex d_mutex;
