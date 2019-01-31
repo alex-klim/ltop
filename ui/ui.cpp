@@ -24,12 +24,12 @@ void Ui::init() const {
     tb_select_output_mode(TB_OUTPUT_256);
 }
 
-void Ui::drawCpuLoad(int y, int startx, int maxx, int load) const {
-    tb_change_cell(startx, y, '[', 151, 236);
-    for (auto i = startx+1; i < load; i++) {
-        tb_change_cell(i, y, '=', 151, 236);
+void Ui::drawCpuLoad(Point start, int maxx, int load) const {
+    tb_change_cell(start.x_, start.y_, '[', 151, 236);
+    for (auto i = start.x_+1; i < load; i++) {
+        tb_change_cell(i, start.y_, '=', 151, 236);
     }
-    tb_change_cell(maxx, y, ']', 151, 236);
+    tb_change_cell(maxx, start.y_, ']', 151, 236);
 }
 
 void Ui::drawSeparator(int y) const {
@@ -38,50 +38,44 @@ void Ui::drawSeparator(int y) const {
     }
 }
 
-void Ui::drawString(int startx, int starty, std::string& msg) const {
+void Ui::drawString(Point start, std::string& msg) const {
     for (size_t i = 0; i < msg.length(); i++) {
-        tb_change_cell(startx+i, starty, msg[i], 151, 236);
+        tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
     }
 }
 
-void Ui::drawSummary(int startx, int starty, data& d) const {
-    std::string buf = "Tasks: " + std::to_string(d.threads)
-        + ", " + std::to_string(d.running) +" running";
-    drawString(startx, starty, buf);
-    buf = "Load average: " + std::to_string(d.load[0]) + ", " + std::to_string(d.load[1])
-        + ", " + std::to_string(d.load[2]);
-    drawString(startx, starty+1, buf);
-    buf = "Uptime: " + std::to_string(d.uptime);
-    drawString(startx, starty+2, buf);
+void Ui::drawSummary(Point start, double load[3], int threads, int running, ull uptime) const {
+    std::string buf = "Tasks: " + std::to_string(threads)
+        + ", " + std::to_string(running) +" running";
+    drawString(start, buf);
+    buf = "Load average: " + std::to_string(load[0]) + ", " + std::to_string(load[1])
+        + ", " + std::to_string(load[2]);
+    drawString(Point(start.x_, start.y_+1), buf);
+    buf = "Uptime: " + std::to_string(uptime);
+    drawString(Point(start.x_, start.y_+2), buf);
 }
 
-void Ui::drawHeader(data& news) const {
-    double arr[4];
-    for (auto i = 0; i < 4; ++i) {
-        arr[i] = i + i*30;
-    }
-    int startx = 2;
-    int starty = 1;
+void Ui::drawStats(Point start, double usage[4]) const {
     int max_width = Ui::w_width/2;
 
     for (auto i = 0; i < 4; i++) {
-        drawCpuLoad(starty+i, startx, max_width, (int)(arr[i]/100*max_width) );
+        drawCpuLoad(Point(start.y_+i, start.x_), max_width, (int)(usage[i]/100*max_width) );
     }
-    drawSeparator(starty+5);
-
-    drawSummary(max_width+5, 1, news);
 }
 
-void Ui::drawAll(data& news) const {
+void Ui::drawAll(Point start, data& news) const {
     tb_clear();
-    drawHeader(news);
+    drawStats(start, news.usage);
+    drawSummary(Point(Ui::w_width+5, start.y_),
+            news.load, news.threads, news.running, news.uptime);
+    drawSeparator(start.y_+5);
     tb_present();
 }
 
 void Ui::ui_loop(data& news) const {
     Ui::set_width();
     Ui::set_height();
-    drawAll(news);
+    drawAll(Point(1,2), news);
 
     struct tb_event ev;
     while (tb_poll_event(&ev)) {
@@ -96,7 +90,7 @@ void Ui::ui_loop(data& news) const {
             case TB_EVENT_RESIZE:
                 Ui::set_height();
                 Ui::set_width();
-                drawAll(news);
+                drawAll(Point(1,2), news);
                 break;
         }
     }
