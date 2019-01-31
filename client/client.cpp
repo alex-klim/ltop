@@ -13,7 +13,7 @@ static std::string MEMINFO_FILE("/proc/meminfo");
 
 constexpr int Client::timeDelta;
 
-void Client::uptime(double& upt, double& idt) const {
+void Client::uptime(double upt, double idt) const {
     std::ifstream ifs(UPTIME_FILE);
 
     if(!ifs.is_open()) {
@@ -26,7 +26,7 @@ void Client::uptime(double& upt, double& idt) const {
 
 }
 
-void Client::loadavg(double& avg1, double& avg5, double& avg15, ull& run, ull& exists) const {
+void Client::loadavg(double avg1, double avg5, double avg15, ull run, ull exists) const {
     std::ifstream ifs(LOADAVG_FILE);
 
     if(!ifs.is_open()) {
@@ -69,8 +69,8 @@ void Client::stat(cpu_info* cpus) const {
     }
 }
 
-void Client::meminfo(ull& memtot, ull& memfree, ull& memav,
-        ull& swptot, ull& swpfree) const {
+void Client::meminfo(ull memtot, ull memfree, ull memav,
+        ull swptot, ull swpfree) const {
     std::ifstream ifs(MEMINFO_FILE);
     std::string line;
 
