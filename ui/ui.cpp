@@ -61,7 +61,7 @@ void Ui::drawStats(Point start, double usage[4]) const {
     int max_width = w_width/2;
 
     for (auto i = 0; i < 4; i++) {
-        drawCpuLoad(Point(start.y_+i, start.x_), max_width, (int)(usage[i]/100*max_width) );
+        drawCpuLoad(Point(start.x_, start.y_+i), max_width, 0.5); //(int)(usage[i]/100*max_width) );
     }
 }
 
