@@ -3,15 +3,12 @@
 #include <iostream>
 
 
-int Ui::w_height = 0;
-int Ui::w_width = 0;
-
 void Ui::set_height() {
-    Ui::w_height = tb_height();
+    w_height = tb_height();
 }
 
 void Ui::set_width() {
-    Ui::w_width = tb_width();
+    w_width = tb_width();
 }
 
 void Ui::init() const {
@@ -24,6 +21,11 @@ void Ui::init() const {
     tb_select_output_mode(TB_OUTPUT_256);
 }
 
+void Ui::on_exit() const {
+    tb_clear();
+    tb_shutdown();
+}
+
 void Ui::drawCpuLoad(Point start, int maxx, int load) const {
     tb_change_cell(start.x_, start.y_, '[', 151, 236);
     for (auto i = start.x_+1; i < load; i++) {
@@ -33,7 +35,7 @@ void Ui::drawCpuLoad(Point start, int maxx, int load) const {
 }
 
 void Ui::drawSeparator(int y) const {
-    for (auto i = 0; i < Ui::w_width; ++i) {
+    for (auto i = 0; i < w_width; ++i) {
         tb_change_cell(i, y, ' ', 151, 151);
     }
 }
@@ -56,7 +58,7 @@ void Ui::drawSummary(Point start, double load[3], int threads, int running, ull 
 }
 
 void Ui::drawStats(Point start, double usage[4]) const {
-    int max_width = Ui::w_width/2;
+    int max_width = w_width/2;
 
     for (auto i = 0; i < 4; i++) {
         drawCpuLoad(Point(start.y_+i, start.x_), max_width, (int)(usage[i]/100*max_width) );
@@ -66,15 +68,15 @@ void Ui::drawStats(Point start, double usage[4]) const {
 void Ui::drawAll(Point start, data& news) const {
     tb_clear();
     drawStats(start, news.usage);
-    drawSummary(Point(Ui::w_width+5, start.y_),
+    drawSummary(Point(w_width+5, start.y_),
             news.load, news.threads, news.running, news.uptime);
     drawSeparator(start.y_+5);
     tb_present();
 }
 
-void Ui::ui_loop(data& news) const {
-    Ui::set_width();
-    Ui::set_height();
+void Ui::ui_loop(data& news) {
+    set_width();
+    set_height();
     drawAll(Point(1,2), news);
 
     struct tb_event ev;
@@ -88,8 +90,8 @@ void Ui::ui_loop(data& news) const {
                 }
                 break;
             case TB_EVENT_RESIZE:
-                Ui::set_height();
-                Ui::set_width();
+                set_height();
+                set_width();
                 drawAll(Point(1,2), news);
                 break;
         }

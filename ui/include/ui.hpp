@@ -7,7 +7,7 @@
 
 using ull = unsigned long long;
 
-using data = struct {
+struct data {
     ull uptime;
     ull idle;
     double load[3];
@@ -29,6 +29,7 @@ public:
     Ui() {};
 
     void init() const;
+    void on_exit() const;
     void drawStats(Point, double[4]) const;
     void drawSeparator(int) const;
     void drawProcList(int, int) const;
@@ -36,16 +37,13 @@ public:
     void drawSummary(Point, double[3], int, int, ull) const;
     void drawString(Point, std::string&) const;
     void drawAll(Point, data&) const;
-    void ui_loop(data&) const;
+    void ui_loop(data&);
 
-    static int w_height;
-    static int w_width;
-
-    static int get_height();
-    static int get_weight();
+    void set_width();
+    void set_height();
 private:
-    static void set_height();
-    static void set_width();
+    int w_height;
+    int w_width;
 };
 
 
