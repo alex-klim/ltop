@@ -10,6 +10,5 @@ int main() {
     App app;
     app.init();
     app.main_loop();
-    app.shutdown();
     return 0;
 }

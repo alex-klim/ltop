@@ -9,7 +9,7 @@
 #include <mutex>
 #include <iostream>
 
-static constexpr int deltaTime = 3000; // milliseconds
+static constexpr int deltaTime = 1000; // milliseconds
 
 struct minfo {
     ull memtot;
@@ -43,9 +43,9 @@ public:
     App(const App&) = delete;
     App& operator=(const App&) = delete;
     void init();
-    void shutdown();
+    void draw();
     void collect_data();
-    int stat_loop();
+    int ui_loop(); // method to be asynced
     int main_loop();
 
 private:
