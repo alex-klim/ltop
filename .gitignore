@@ -28,5 +28,4 @@
 *.app
 
 # Custom
-*.txt
 build/
