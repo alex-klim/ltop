@@ -77,7 +77,7 @@ void Ui::drawStats(Point start, double usage[4]) const {
 void Ui::drawProcStat(Point start, proc_data* news) const {
     char* buff = new char[w_width-1];
     snprintf(buff, w_width-1,
-            "%i  %s  %s  %i  %i  %i  %i  %i  %i %c\0",
+            "%6i  %25s  %10s  %4i  %4i  %10i  %10i  %10i  %8i %c\0",
             news->pid, news->name.c_str(), news->user.c_str(), news->pri, news->ni, news->virt,
             news->res, news->shr, news->ltime, news->state);
     std::string to_render(buff);
