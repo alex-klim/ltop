@@ -12,7 +12,7 @@
 #include <vector>
 #include <experimental/filesystem>
 
-static constexpr int deltaTime = 1000; // milliseconds
+static constexpr int deltaTime = 2000; // milliseconds
 
 struct minfo {
     ull memtot;
@@ -55,6 +55,7 @@ private:
     std::unique_ptr<Client> cl;
     std::unique_ptr<Ui> ui;
     std::mutex d_mutex;
+    std::mutex p_mutex;
 };
 
 #endif // APP_H

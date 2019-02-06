@@ -50,9 +50,13 @@ public:
 
     void set_width();
     void set_height();
+    int get_width() const;
+    int get_height() const;
 private:
     int w_height;
     int w_width;
+public:
+    static size_t firstToDraw;
 };
 
 

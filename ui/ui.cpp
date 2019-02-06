@@ -3,12 +3,22 @@
 #include <iostream>
 
 
+size_t Ui::firstToDraw = 0;
+
 void Ui::set_height() {
     w_height = tb_height();
 }
 
 void Ui::set_width() {
     w_width = tb_width();
+}
+
+int Ui::get_height() const {
+    return w_height;
+}
+
+int Ui::get_width() const {
+    return w_width;
 }
 
 void Ui::init() const {
@@ -77,7 +87,7 @@ void Ui::drawStats(Point start, double usage[4]) const {
 void Ui::drawProcStat(Point start, proc_data* news) const {
     char* buff = new char[w_width-1];
     snprintf(buff, w_width-1,
-            "%6i  %25s  %10s  %4i  %4i  %10i  %10i  %10i  %8i %c\0",
+            "%6i  %35s  %25s  %4i  %4i  %10i  %10i  %10i  %8i %c\0",
             news->pid, news->name.c_str(), news->user.c_str(), news->pri, news->ni, news->virt,
             news->res, news->shr, news->ltime, news->state);
     std::string to_render(buff);
@@ -86,8 +96,8 @@ void Ui::drawProcStat(Point start, proc_data* news) const {
 
 void Ui::drawProcList(Point start, std::vector<proc_data>& pnews) const {
     int i = 0;
-    for (auto it: pnews) {
-        drawProcStat(Point(start.x_, start.y_+i), &it);
+    for (auto it = pnews.begin()+Ui::firstToDraw; it != pnews.end(); it++) {
+        drawProcStat(Point(start.x_, start.y_+i), &(*it));
         i++;
     }
 }

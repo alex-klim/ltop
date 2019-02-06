@@ -47,15 +47,17 @@ void App::init() {
 
 void App::collect_proclist() {
     fs::path proc("/proc");
-
-    if (fs::is_directory(proc)) {
-        for (auto& p: fs::directory_iterator(proc)) {
-            std::string ogo(p.path().filename());
-            if (is_num(ogo)) {
-                pd.push_back(proc_data());
-                std::string filename = proc.string()+'/'+ogo+"/stat";
-                cl->procstat(filename, &(pd.back()));
-                cl->procstatus(filename+"us", &(pd.back()));
+    {
+        std::lock_guard<std::mutex> lock(p_mutex);
+        if (fs::is_directory(proc)) {
+            for (auto& p: fs::directory_iterator(proc)) {
+                std::string ogo(p.path().filename());
+                if (is_num(ogo)) {
+                    pd.push_back(proc_data());
+                    std::string filename = proc.string()+'/'+ogo+"/stat";
+                    cl->procstat(filename, &(pd.back()));
+                    cl->procstatus(filename+"us", &(pd.back()));
+                }
             }
         }
     }
@@ -83,6 +85,23 @@ int App::ui_loop() {
                 switch (ev.key) {
                     case TB_KEY_ESC:
                         goto done;
+                        break;
+                    case TB_KEY_ARROW_DOWN: // scrolling down the process list
+                        {                   // need to backup mutex for process container
+                            std::lock_guard<std::mutex> lock(p_mutex);
+                            if (Ui::firstToDraw < pd.size()-(ui->get_height())) {// <- here's why
+                                Ui::firstToDraw++;
+                            }
+                            std::cerr << Ui::firstToDraw << '\n';
+                        }
+                        draw();
+                        break;
+                    case TB_KEY_ARROW_UP: // scrolling up the process list
+                        if (Ui::firstToDraw > 0) {
+                            Ui::firstToDraw--;
+                        }
+                        draw();
+                        std::cerr << Ui::firstToDraw << '\n';
                         break;
                 }
                 break;
