@@ -1,6 +1,7 @@
 #include "include/ui.hpp"
 
 #include <iostream>
+#include <cstring>
 
 
 size_t Ui::firstToDraw = 0;
@@ -46,9 +47,18 @@ void Ui::drawCpuLoad(Point start, int maxx, int load) const {
 }
 
 void Ui::drawSeparator(int y) const {
-    for (auto i = 0; i < w_width; ++i) {
+    char* buff = new char[w_width-1];
+    snprintf(buff, w_width-1,
+            "%6s  %25s  %4s  %4s  %10s  %10s  %10s  %8s %c  %40s\0",
+            "pid", "User", "PRI", "NI", "VIRT",
+            "RES", "SHR", "TIME", 'S', "Process");
+    for (size_t i = 0; i < strlen(buff); i++) {
+        tb_change_cell(i+1, y, buff[i], 236, 151);
+    }
+    for (auto i = strlen(buff); i < w_width; ++i) {
         tb_change_cell(i, y, ' ', 151, 151);
     }
+    delete buff;
 }
 
 void Ui::drawString(Point start, std::string& msg) const {
@@ -87,11 +97,12 @@ void Ui::drawStats(Point start, double usage[4]) const {
 void Ui::drawProcStat(Point start, proc_data* news) const {
     char* buff = new char[w_width-1];
     snprintf(buff, w_width-1,
-            "%6i  %35s  %25s  %4i  %4i  %10i  %10i  %10i  %8i %c\0",
-            news->pid, news->name.c_str(), news->user.c_str(), news->pri, news->ni, news->virt,
-            news->res, news->shr, news->ltime, news->state);
+            "%6i  %25s  %4i  %4i  %10i  %10i  %10i  %8i %c  %40s\0",
+            news->pid, news->user.c_str(), news->pri, news->ni, news->virt,
+            news->res, news->shr, news->ltime, news->state, news->name.c_str());
     std::string to_render(buff);
     drawString(start, to_render);
+    delete buff;
 }
 
 void Ui::drawProcList(Point start, std::vector<proc_data>& pnews) const {
