@@ -180,7 +180,7 @@ void Client::procstat(std::string filename, proc_data* data) const {
                     std::stringstream temp;
                     temp << line;
                     temp >> data->pid;
-                    data->user = user_from_uid(data->pid);
+                    // data->user = user_from_uid(data->pid); <- uid != pid
                     break;
                     }
             case 2: data->name = line; break;
@@ -235,7 +235,7 @@ void Client::procstat(std::string filename, proc_data* data) const {
     }
 }
 
-void Client::procstatus(std::string filename, std::unique_ptr<proc_data>& data) const {
+void Client::procstatus(std::string filename, proc_data* data) const {
     std::ifstream ifs(filename);
     std::string garbage;
 

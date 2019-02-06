@@ -53,7 +53,9 @@ void App::collect_proclist() {
             std::string ogo(p.path().filename());
             if (is_num(ogo)) {
                 pd.push_back(proc_data());
-                cl->procstat(proc.string()+'/'+ogo+"/stat", &(pd.back()));
+                std::string filename = proc.string()+'/'+ogo+"/stat";
+                cl->procstat(filename, &(pd.back()));
+                cl->procstatus(filename+"us", &(pd.back()));
             }
         }
     }

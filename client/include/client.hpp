@@ -28,7 +28,7 @@ public:
     void stat(cpu_info*) const;
     void meminfo(ull&, ull&, ull&, ull&, ull&) const;
     void procstat(std::string, proc_data*) const;
-    void procstatus(std::string, std::unique_ptr<proc_data>&) const;
+    void procstatus(std::string, proc_data*) const;
 };
 
 #endif
