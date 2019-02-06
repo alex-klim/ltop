@@ -28,7 +28,8 @@ int main() {
     cpu_info* arr = new cpu_info[9];
     cpu_info* last = new cpu_info[9];
     double usage[4];
-
+    proc_data* info = new proc_data();
+/*
     client.uptime(upt, idt);
     client.loadavg(av1, av5, av15, runnable, exists);
     client.meminfo(memtot, memfree, memav, stot, sfree);
@@ -52,9 +53,9 @@ int main() {
               << "\nMemAvailable: " << memav
               << "\nSwapTotal: " << stot
               << "\nSwapFree:" << sfree <<'\n';
-
+*/
     while (1) {
-        cpu_cpy(last, arr);
+        /*cpu_cpy(last, arr);
         client.stat(arr);
         calc_usage(last, arr, usage);
 
@@ -96,12 +97,26 @@ int main() {
               << "\nsystem: " << arr[4].system
               << "\nidle: " << arr[4].idle
               << "\niowait:" << arr[4].iowait <<'\n'
-              << "Cpu3 usage: " << usage[3] << '\n';
+              << "Cpu3 usage: " << usage[3] << '\n';*/
+
+        client.procstat("/proc/839/stat", info);
+        client.procstatus("/proc/839/status", info);
+        std::cout << "Info: \n"
+            << "pid: " << info->pid << '\n'
+            << "user: " << info->user << '\n'
+            << "name: " << info->name << '\n'
+            << "state: " << info->state << '\n'
+            << "ltime: " << info->ltime << '\n'
+            << "pri: " << info->pri << '\n'
+            << "ni: " << info->ni << '\n'
+            << "virt: " << info->virt << '\n'
+            << "res: " << info->res << '\n';
 
         std::this_thread::sleep_for(std::chrono::milliseconds(Client::timeDelta));
     }
 
     delete[] arr;
     delete[] last;
+    delete info;
     return 0;
 }

@@ -2,9 +2,12 @@
 #define APP_CPP
 
 #include "app.hpp"
+#include "utils.cpp"
 
 #include <chrono>
 #include <thread>
+
+namespace fs = std::experimental::filesystem;
 
 void cpu_cpy(cpu_info* dst, cpu_info* src) {
     for (auto i = 0; i < 9; ++i) {
@@ -42,6 +45,20 @@ void App::init() {
     std::this_thread::sleep_for(std::chrono::milliseconds(deltaTime));
 }
 
+void App::collect_proclist() {
+    fs::path proc("/proc");
+
+    if (fs::is_directory(proc)) {
+        for (auto& p: fs::directory_iterator(proc)) {
+            std::string ogo(p.path().filename());
+            if (is_num(ogo)) {
+                pd.push_back(proc_data());
+                cl->procstat(proc.string()+'/'+ogo+"/stat", &(pd.back()));
+            }
+        }
+    }
+}
+
 void App::collect_data() {
     cpu_cpy(gd->last, gd->cur);
     cl->uptime(gd->uptime, gd->idle);
@@ -49,6 +66,7 @@ void App::collect_data() {
     cl->meminfo(md->memtot, md->memfree, md->memav, md->stot, md->sfree);
     cl->stat(gd->cur);
     calc_usage(gd->last, gd->cur, gd->usage);
+    collect_proclist();
 }
 
 int App::ui_loop() {
@@ -89,7 +107,7 @@ void App::draw() {
             gd->threads,
             gd->running
         };
-        ui->drawAll(Point(1,2), news);
+        ui->drawAll(Point(1,2), news, pd);
     }
 }
 

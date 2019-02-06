@@ -1,9 +1,3 @@
-#include <termbox.h>
-#include <iostream>
-#include <vector>
-
-#include "client.hpp"
-#include "ui.hpp"
 #include "app.hpp"
 
 int main() {

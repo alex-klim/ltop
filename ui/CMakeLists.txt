@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.12)
+project(ui)
+#add_executable(ui main.cpp ui.cpp)
+add_library(ui STATIC ui.cpp)
+target_include_directories(ui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(ui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../)
+target_link_libraries(ui libtermbox.a)
+

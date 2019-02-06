@@ -3,11 +3,14 @@
 
 #include "client.hpp"
 #include "ui.hpp"
+#include "containers.hpp"
 
 #include <memory>
 #include <future>
 #include <mutex>
 #include <iostream>
+#include <vector>
+#include <experimental/filesystem>
 
 static constexpr int deltaTime = 1000; // milliseconds
 
@@ -30,12 +33,6 @@ struct ginfo {
     cpu_info* cur;
 };
 
-/*struct appinfo {
-    cpuinfo cpus[8];
-    psinfo* processes;
-    double uptime;
-};*/
-
 class App {
 public:
     App();
@@ -45,16 +42,19 @@ public:
     void init();
     void draw();
     void collect_data();
+    void collect_proclist();
     int ui_loop(); // method to be asynced
     int main_loop();
 
 private:
+//    using std::vector< std::unique_ptr<proc_data> > = VectorUpDataT;
     std::unique_ptr<ginfo> gd;
     std::unique_ptr<minfo> md;
+    std::vector<proc_data> pd;
 
     std::unique_ptr<Client> cl;
     std::unique_ptr<Ui> ui;
     std::mutex d_mutex;
 };
 
-#endif
+#endif // APP_H

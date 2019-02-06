@@ -1,10 +1,11 @@
 #include "include/client.hpp"
 
 #include <string>
+#include <cstring>
 #include <fstream>
 #include <sstream>
 #include <iostream>
-
+#include <pwd.h>
 
 static std::string STAT_FILE("/proc/stat");
 static std::string UPTIME_FILE("/proc/uptime");
@@ -12,6 +13,39 @@ static std::string LOADAVG_FILE("/proc/loadavg");
 static std::string MEMINFO_FILE("/proc/meminfo");
 
 constexpr int Client::timeDelta;
+// ============ carefully borrowed from procps ==========
+#define P_G_SZ 20
+#define	HASHSIZE	64		/* power of 2 */
+#define	HASH(x)		((x) & (HASHSIZE - 1))
+
+static struct pwbuf {
+    struct pwbuf *next;
+    uid_t uid;
+    char name[P_G_SZ];
+} *pwhash[HASHSIZE];
+
+char *user_from_uid(uid_t uid) {
+    struct pwbuf **p;
+    struct passwd *pw;
+
+    p = &pwhash[HASH(uid)];
+    while (*p) {
+	if ((*p)->uid == uid)
+	    return((*p)->name);
+	p = &(*p)->next;
+    }
+    *p = (struct pwbuf *) malloc(sizeof(struct pwbuf));
+    (*p)->uid = uid;
+    pw = getpwuid(uid);
+    if(!pw || strlen(pw->pw_name) >= P_G_SZ)
+	sprintf((*p)->name, "%u", uid);
+    else
+        strcpy((*p)->name, pw->pw_name);
+
+    (*p)->next = NULL;
+    return((*p)->name);
+}
+// ============== end of borrowed content ================
 
 void Client::uptime(ull& upt, ull& idt) const {
     std::ifstream ifs(UPTIME_FILE);
@@ -128,4 +162,96 @@ void Client::meminfo(ull& memtot, ull& memfree, ull& memav,
         line.clear();
     }
 
+}
+
+void Client::procstat(std::string filename, proc_data* data) const {
+    std::ifstream ifs(filename);
+    std::string line;
+
+    if(!ifs.is_open()) {
+        std::cerr << "Failed to read file\n";
+        return;
+    }
+
+    for (auto i = 1; i < 25; i++) {
+        ifs >> line;
+        switch (i) {
+            case 1: {
+                    std::stringstream temp;
+                    temp << line;
+                    temp >> data->pid;
+                    data->user = user_from_uid(data->pid);
+                    break;
+                    }
+            case 2: data->name = line; break;
+            case 3: {
+                    std::stringstream temp;
+                    temp << line;
+                    temp >> data->state;
+                    break;
+                    }
+            case 14: {
+                    std::stringstream temp;
+                    temp << line;
+                    temp >> data->ltime;
+                    break;
+                     }
+            case 15: {
+                    std::stringstream temp;
+                    int tmp;
+                    temp << line;
+                    temp >> tmp;
+                    data->ltime += tmp;
+                    break;
+                    }
+            case 18: {
+                    std::stringstream temp;
+                    temp << line;
+                    temp >> data->pri;
+                    break;
+                     }
+            case 19: {
+                    std::stringstream temp;
+                    temp << line;
+                    temp >> data->ni;
+                    break;
+                     }
+            case 23: {
+                    std::stringstream temp;
+                    temp << line;
+                    temp >> data->virt;
+                    data->virt /= 1024;
+                    break;
+                     }
+            case 24: {
+                    std::stringstream temp;
+                    temp << line;
+                    temp >> data->res;
+                    data->res *= 4;
+                    break;
+                     }
+        }
+        line.clear();
+    }
+}
+
+void Client::procstatus(std::string filename, std::unique_ptr<proc_data>& data) const {
+    std::ifstream ifs(filename);
+    std::string garbage;
+
+    if(!ifs.is_open()){
+        std::cerr << "couldn't open the file\n";
+        return;
+    }
+
+    for (auto i = 0; i < 9; i++) {
+        garbage.clear();
+        std::getline(ifs, garbage);
+    }
+    std::stringstream tmp(garbage);
+    garbage.clear();
+    tmp >> garbage;
+    int uid;
+    tmp >> uid;
+    data->user = user_from_uid(uid);
 }
