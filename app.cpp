@@ -92,7 +92,6 @@ int App::ui_loop() {
                             if (Ui::firstToDraw < pd.size()-(ui->get_height())) {// <- here's why
                                 Ui::firstToDraw++;
                             }
-                            std::cerr << Ui::firstToDraw << '\n';
                         }
                         draw();
                         break;
@@ -101,7 +100,6 @@ int App::ui_loop() {
                             Ui::firstToDraw--;
                         }
                         draw();
-                        std::cerr << Ui::firstToDraw << '\n';
                         break;
                 }
                 break;
