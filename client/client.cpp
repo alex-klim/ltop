@@ -64,6 +64,7 @@ void Client::uptime(ull& upt, ull& idt) const {
 
 void Client::loadavg(double& avg1, double& avg5, double& avg15, int& run, int& threads) const {
     std::ifstream ifs(LOADAVG_FILE);
+    char slash;
 
     if(!ifs.is_open()) {
         std::cerr << "Failed to read file\n";
@@ -74,6 +75,7 @@ void Client::loadavg(double& avg1, double& avg5, double& avg15, int& run, int& t
     ifs >> avg5;
     ifs >> avg15;
     ifs >> run;
+    ifs >> slash;
     ifs >> threads;
 
 }
