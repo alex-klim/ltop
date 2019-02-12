@@ -2,7 +2,7 @@
 #define APP_CPP
 
 #include "app.hpp"
-#include "utils.cpp"
+#include "utils.h"
 
 #include <chrono>
 #include <thread>

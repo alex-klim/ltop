@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include <thread>
+#include "../utils.h"
 
 
 size_t Ui::firstToDraw = 0;
@@ -83,7 +84,7 @@ void Ui::drawSummary(Point start, double load[3], int threads, int running, ull 
         + ", " + std::to_string(load[2]);
     //std::cerr << buf <<'\n';
     drawString(Point(start.x_, start.y_+1), buf);
-    buf = "Uptime: " + std::to_string(uptime);
+    buf = "Uptime: " + tts(uptime);
     //std::cerr << buf <<'\n';
     drawString(Point(start.x_, start.y_+2), buf);
 }
