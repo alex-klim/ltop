@@ -185,7 +185,7 @@ void Client::procstat(std::string filename, proc_data* data) const {
                     // data->user = user_from_uid(data->pid); <- uid != pid
                     break;
                     }
-            case 2: data->name = line; break;
+            case 2: data->name = std::string(line.cbegin()+1, line.cend()-1); break;
             case 3: {
                     std::stringstream temp;
                     temp << line;
