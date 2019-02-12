@@ -2,9 +2,11 @@
 
 #include <iostream>
 #include <cstring>
+#include <thread>
 
 
 size_t Ui::firstToDraw = 0;
+size_t Ui::nCpus = std::thread::hardware_concurrency();
 
 void Ui::set_height() {
     w_height = tb_height();
@@ -89,7 +91,7 @@ void Ui::drawSummary(Point start, double load[3], int threads, int running, ull 
 void Ui::drawStats(Point start, double usage[4]) const {
     int max_width = w_width/2;
 
-    for (auto i = 0; i < 4; i++) {
+    for (size_t i = 0; i < Ui::nCpus; i++) {
         drawCpuLoad(Point(start.x_, start.y_+i), max_width, (int)(usage[i]*max_width) );
     }
 }

@@ -90,7 +90,7 @@ int App::ui_loop() {
                     case TB_KEY_ARROW_DOWN: // scrolling down the process list
                         {                   // need to backup mutex for process container
                             std::lock_guard<std::mutex> lock(p_mutex);
-                            if (Ui::firstToDraw < pd.size()-(ui->get_height()-7)) {// <- here's why
+                            if (Ui::firstToDraw < pd.size()-(ui->get_height()-4-Ui::nCpus)) {// <- here's why
                                 Ui::firstToDraw++;
                             }
                         }
