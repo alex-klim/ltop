@@ -47,6 +47,7 @@ void App::init() {
 
 void App::collect_proclist() {
     fs::path proc("/proc");
+    pd.clear();
     {
         std::lock_guard<std::mutex> lock(p_mutex);
         if (fs::is_directory(proc)) {
@@ -89,7 +90,7 @@ int App::ui_loop() {
                     case TB_KEY_ARROW_DOWN: // scrolling down the process list
                         {                   // need to backup mutex for process container
                             std::lock_guard<std::mutex> lock(p_mutex);
-                            if (Ui::firstToDraw < pd.size()-(ui->get_height())) {// <- here's why
+                            if (Ui::firstToDraw < pd.size()-(ui->get_height()-7)) {// <- here's why
                                 Ui::firstToDraw++;
                             }
                         }
