@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <thread>
+#include <signal.h>
 
 namespace fs = std::experimental::filesystem;
 
@@ -87,11 +88,15 @@ int App::ui_loop() {
                     case TB_KEY_ESC:
                         goto done;
                         break;
+                    case TB_KEY_F9:
+                        kill(pd[Ui::currentLine].pid, SIGTERM);
+                        draw();
+                        break;
                     case TB_KEY_ARROW_DOWN: // scrolling down the process list
                         {                   // need to backup mutex for process container
                             std::lock_guard<std::mutex> lock(p_mutex);
                             if (Ui::currentLine < pd.size()-1) {
-                                if (Ui::firstToDraw == Ui::currentLine - ui->get_height()+Ui::nCpus+4) {
+                                if (Ui::firstToDraw == Ui::currentLine - ui->get_height()+Ui::nCpus+6) {
                                     Ui::firstToDraw++;
                                 }
                                 Ui::currentLine++;
@@ -133,7 +138,7 @@ void App::draw() {
             gd->threads,
             gd->running
         };
-        ui->drawAll(Point(1,1), news, pd);
+        ui->drawAll(Point(1,1), news, *md, pd);
     }
 }
 

@@ -14,14 +14,6 @@
 
 static constexpr int deltaTime = 2000; // milliseconds
 
-struct minfo {
-    ull memtot;
-    ull memfree;
-    ull memav;
-    ull stot;
-    ull sfree;
-};
-
 struct ginfo {
     ull uptime;
     ull idle;
