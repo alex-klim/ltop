@@ -7,6 +7,7 @@
 
 
 size_t Ui::firstToDraw = 0;
+size_t Ui::currentLine = 0;
 size_t Ui::nCpus = std::thread::hardware_concurrency();
 
 void Ui::set_height() {
@@ -69,8 +70,14 @@ void Ui::drawString(Point start, std::string& msg) const {
     //std::cerr << "Point: (" << start.x_ << ", " << start.y_ << ")\n";
     //std::cerr << msg <<'\n';
     //std::cerr << "===================================\n";
-    for (size_t i = 0; i < msg.length(); i++) {
-        tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
+    if (start.y_ == Ui::currentLine - Ui::firstToDraw + Ui::nCpus + 3) {
+        for (size_t i = 0; i < msg.length(); i++) {
+            tb_change_cell(start.x_+i, start.y_, msg[i], 236, 159);
+        }
+    } else {
+        for (size_t i = 0; i < msg.length(); i++) {
+            tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
+        }
     }
 }
 

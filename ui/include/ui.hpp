@@ -57,6 +57,7 @@ private:
     int w_width;
 public:
     static size_t firstToDraw;
+    static size_t currentLine;
     static size_t nCpus;
 };
 

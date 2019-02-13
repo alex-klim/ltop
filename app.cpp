@@ -90,15 +90,21 @@ int App::ui_loop() {
                     case TB_KEY_ARROW_DOWN: // scrolling down the process list
                         {                   // need to backup mutex for process container
                             std::lock_guard<std::mutex> lock(p_mutex);
-                            if (Ui::firstToDraw < pd.size()-(ui->get_height()-4-Ui::nCpus)) {// <- here's why
-                                Ui::firstToDraw++;
+                            if (Ui::currentLine < pd.size()-1) {
+                                if (Ui::firstToDraw == Ui::currentLine - ui->get_height()+Ui::nCpus+4) {
+                                    Ui::firstToDraw++;
+                                }
+                                Ui::currentLine++;
                             }
                         }
                         draw();
                         break;
                     case TB_KEY_ARROW_UP: // scrolling up the process list
-                        if (Ui::firstToDraw > 0) {
-                            Ui::firstToDraw--;
+                        if (Ui::currentLine > 0) {
+                            if (Ui::currentLine == Ui::firstToDraw) {
+                                Ui::firstToDraw--;
+                            }
+                            Ui::currentLine--;
                         }
                         draw();
                         break;
@@ -127,7 +133,7 @@ void App::draw() {
             gd->threads,
             gd->running
         };
-        ui->drawAll(Point(1,2), news, pd);
+        ui->drawAll(Point(1,1), news, pd);
     }
 }
 
