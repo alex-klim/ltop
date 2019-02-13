@@ -38,15 +38,17 @@ public:
 
     void init() const;
     void on_exit() const;
-    void drawStats(Point, double[4]) const;
+    void drawStats(Point, double[4], minfo&) const;
     void drawSeparator(int) const;
     void drawProcStat(Point, proc_data*) const;
+    void drawMemUsage(Point, int, int) const;
+    void drawSwpUsage(Point, int, int) const;
     void drawProcList(Point, std::vector<proc_data>& ) const;
-    void drawCpuLoad(Point, int, int) const;
+    void drawCpuLoad(Point, int, int, int) const;
     void drawSummary(Point, double[3], int, int, ull) const;
     void drawString(Point, std::string&) const;
     void drawLine(Point, std::string&) const;
-    void drawAll(Point, data&, std::vector<proc_data>&) const;
+    void drawAll(Point, data&, minfo&, std::vector<proc_data>&) const;
     void ui_loop(data&);
 
     void set_width();

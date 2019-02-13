@@ -41,10 +41,31 @@ void Ui::on_exit() const {
     tb_shutdown();
 }
 
-void Ui::drawCpuLoad(Point start, int maxx, int load) const {
+void Ui::drawCpuLoad(Point start, int maxx, int load, int cpuN) const {
     //std::cerr << "Max: " << maxx << '\n';
-    tb_change_cell(start.x_, start.y_, '[', 151, 236);
-    for (auto i = start.x_+1; i < load; i++) {
+    tb_change_cell(start.x_, start.y_, '0'+cpuN, 151, 236);
+    tb_change_cell(start.x_+3, start.y_, '[', 151, 236);
+    for (auto i = start.x_+4; i < load; i++) {
+        tb_change_cell(i, start.y_, '=', 151, 236);
+    }
+    tb_change_cell(maxx, start.y_, ']', 151, 236);
+}
+
+void Ui::drawMemUsage(Point start, int maxx, int load) const {
+    std::string label("Mem");
+    drawString(start, label);
+    tb_change_cell(start.x_+3, start.y_, '[', 151, 236);
+    for (auto i = start.x_+4; i < load; i++) {
+        tb_change_cell(i, start.y_, '=', 151, 236);
+    }
+    tb_change_cell(maxx, start.y_, ']', 151, 236);
+}
+
+void Ui::drawSwpUsage(Point start, int maxx, int load) const {
+    std::string label("Swp");
+    drawString(start, label);
+    tb_change_cell(start.x_+3, start.y_, '[', 151, 236);
+    for (auto i = start.x_+4; i < load; i++) {
         tb_change_cell(i, start.y_, '=', 151, 236);
     }
     tb_change_cell(maxx, start.y_, ']', 151, 236);
@@ -76,7 +97,7 @@ void Ui::drawString(Point start, std::string& msg) const {
 }
 
 void Ui::drawLine(Point start, std::string& msg) const {
-    if (start.y_ == Ui::currentLine - Ui::firstToDraw + Ui::nCpus + 3) {
+    if (start.y_ == Ui::currentLine - Ui::firstToDraw + Ui::nCpus + 5) {
         for (size_t i = 0; i < msg.length(); i++) {
             tb_change_cell(start.x_+i, start.y_, msg[i], 236, 159);
         }
@@ -103,17 +124,24 @@ void Ui::drawSummary(Point start, double load[3], int threads, int running, ull 
         + ", " + std::to_string(load[2]);
     //std::cerr << buf <<'\n';
     drawString(Point(start.x_, start.y_+1), buf);
-    buf = "Uptime: " + tts(uptime);
+    char cbuf[9];
+    ttcs(cbuf, uptime);
+    buf = "Uptime: ";
+    buf += cbuf;
     //std::cerr << buf <<'\n';
     drawString(Point(start.x_, start.y_+2), buf);
 }
 
-void Ui::drawStats(Point start, double usage[4]) const {
+void Ui::drawStats(Point start, double usage[4], minfo& mi) const {
     int max_width = w_width/2;
 
     for (size_t i = 0; i < Ui::nCpus; i++) {
-        drawCpuLoad(Point(start.x_, start.y_+i), max_width, (int)(usage[i]*max_width) );
+        drawCpuLoad(Point(start.x_, start.y_+i), max_width, (int)(usage[i]*(max_width-5)), i+1);
     }
+    drawMemUsage(Point(start.x_, start.y_+Ui::nCpus), max_width,
+            (int)((double)(mi.memtot-mi.memav)/(double)(mi.memtot)*(max_width-5)));
+    drawSwpUsage(Point(start.x_, start.y_+Ui::nCpus+1), max_width,
+            (int)((double)(mi.stot-mi.sfree)/(double)(mi.stot)*(max_width-5)));
 }
 
 void Ui::drawProcStat(Point start, proc_data* news) const {
@@ -137,7 +165,7 @@ void Ui::drawProcList(Point start, std::vector<proc_data>& pnews) const {
     }
 }
 
-void Ui::drawAll(Point start, data& news, std::vector<proc_data>& pnews) const {
+void Ui::drawAll(Point start, data& news, minfo& mi, std::vector<proc_data>& pnews) const {
     /*std::cerr << news.uptime << '\n'
         << news.idle << '\n'
         << news.load[0] << " " << news.load[1] << " " << news.load[2] << '\n'
@@ -146,11 +174,11 @@ void Ui::drawAll(Point start, data& news, std::vector<proc_data>& pnews) const {
         << news.running << '\n';*/
 
     tb_clear();
-    drawStats(start, news.usage);
+    drawStats(start, news.usage, mi);
     drawSummary(Point(w_width/2+5, start.y_),
             news.load, news.threads, news.running, news.uptime);
-    drawSeparator(start.y_+5);
-    drawProcList(Point(start.x_, start.y_+6), pnews);
+    drawSeparator(start.y_+7);
+    drawProcList(Point(start.x_, start.y_+8), pnews);
     tb_present();
 }
 
