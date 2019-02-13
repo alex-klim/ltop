@@ -45,6 +45,7 @@ public:
     void drawCpuLoad(Point, int, int) const;
     void drawSummary(Point, double[3], int, int, ull) const;
     void drawString(Point, std::string&) const;
+    void drawLine(Point, std::string&) const;
     void drawAll(Point, data&, std::vector<proc_data>&) const;
     void ui_loop(data&);
 

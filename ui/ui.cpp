@@ -70,13 +70,25 @@ void Ui::drawString(Point start, std::string& msg) const {
     //std::cerr << "Point: (" << start.x_ << ", " << start.y_ << ")\n";
     //std::cerr << msg <<'\n';
     //std::cerr << "===================================\n";
+    for (size_t i = 0; i < msg.length(); i++) {
+        tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
+    }
+}
+
+void Ui::drawLine(Point start, std::string& msg) const {
     if (start.y_ == Ui::currentLine - Ui::firstToDraw + Ui::nCpus + 3) {
         for (size_t i = 0; i < msg.length(); i++) {
             tb_change_cell(start.x_+i, start.y_, msg[i], 236, 159);
         }
+        for (auto i = msg.length()+1; i < w_width; ++i) {
+            tb_change_cell(i, start.y_, ' ', 159, 159);
+        }
     } else {
         for (size_t i = 0; i < msg.length(); i++) {
             tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
+        }
+        for (auto i = msg.length()+1; i < w_width; ++i) {
+            tb_change_cell(i, start.y_, ' ', 236, 236);
         }
     }
 }
@@ -113,7 +125,7 @@ void Ui::drawProcStat(Point start, proc_data* news) const {
             news->pid, news->user.c_str(), news->pri, news->ni, news->virt,
             news->res, news->shr, timer, news->state, news->name.c_str());
     std::string to_render(buff);
-    drawString(start, to_render);
+    drawLine(start, to_render);
     delete buff;
 }
 
