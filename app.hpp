@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <experimental/filesystem>
+#include <array>
 
 static constexpr int deltaTime = 2000; // milliseconds
 
@@ -21,8 +22,8 @@ struct ginfo {
     double usage[4];
     int threads;
     int running;
-    cpu_info* last;
-    cpu_info* cur;
+    std::array<cpu_info, 9> last;
+    std::array<cpu_info, 9> cur;
 };
 
 class App {
@@ -35,19 +36,18 @@ public:
     void draw();
     void collect_data();
     void collect_proclist();
-    int ui_loop(); // method to be asynced
-    int main_loop();
+    int ui_loop(); // method for ui loop
+    int main_loop(); // method for gathering procfs info
 
 private:
-//    using std::vector< std::unique_ptr<proc_data> > = VectorUpDataT;
     std::unique_ptr<ginfo> gd;
     std::unique_ptr<minfo> md;
     std::vector<proc_data> pd;
 
     std::unique_ptr<Client> cl;
     std::unique_ptr<Ui> ui;
-    std::mutex d_mutex;
-    std::mutex p_mutex;
+    std::mutex d_mutex; // mutex for syncing global data
+    std::mutex p_mutex; // mutex for syncing process data
 };
 
 #endif // APP_H

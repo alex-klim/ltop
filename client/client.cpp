@@ -12,8 +12,7 @@ static std::string UPTIME_FILE("/proc/uptime");
 static std::string LOADAVG_FILE("/proc/loadavg");
 static std::string MEMINFO_FILE("/proc/meminfo");
 
-constexpr int Client::timeDelta;
-// ============ carefully borrowed from procps ==========
+// ============ carefully borrowed from procps =============
 #define P_G_SZ 20
 #define	HASHSIZE	64		/* power of 2 */
 #define	HASH(x)		((x) & (HASHSIZE - 1))
@@ -45,13 +44,13 @@ char *user_from_uid(uid_t uid) {
     (*p)->next = NULL;
     return((*p)->name);
 }
-// ============== end of borrowed content ================
+// ============== end of borrowed content ===================
 
 void Client::uptime(ull& upt, ull& idt) const {
     std::ifstream ifs(UPTIME_FILE);
 
     if(!ifs.is_open()) {
-        std::cerr << "Failed to read file\n";
+        std::cerr << "Failed to read file: uptime\n";
         return;
     }
     double tmp;
@@ -67,7 +66,7 @@ void Client::loadavg(double& avg1, double& avg5, double& avg15, int& run, int& t
     char slash;
 
     if(!ifs.is_open()) {
-        std::cerr << "Failed to read file\n";
+        std::cerr << "Failed to read file: loadavg\n";
         return;
     }
 
@@ -80,13 +79,13 @@ void Client::loadavg(double& avg1, double& avg5, double& avg15, int& run, int& t
 
 }
 
-void Client::stat(cpu_info* cpus) const {
+void Client::stat(std::array<cpu_info, 9>& cpus) const {
     std::ifstream ifs(STAT_FILE);
     std::string line;
     int i = 0;
 
     if(!ifs.is_open()) {
-        std::cerr << "Failed to read file\n";
+        std::cerr << "Failed to read file: stat\n";
         return;
     }
 
@@ -113,12 +112,11 @@ void Client::meminfo(ull& memtot, ull& memfree, ull& memav,
     std::string line;
 
     if(!ifs.is_open()) {
-        std::cerr << "Failed to read file\n";
+        std::cerr << "Failed to read file: meminfo\n";
         return;
     }
 
     for (auto i = 0; std::getline(ifs, line); ++i) {
-        //std::cout << "Line" << i << ": " << line << '\n';
         switch(i) {
             case 0: {
                 std::stringstream temp;
@@ -170,10 +168,12 @@ void Client::procstat(std::string filename, proc_data* data) const {
     std::ifstream ifs(filename);
     std::string line;
 
+    #ifdef DEBUG
     if(!ifs.is_open()) {
-        std::cerr << "Failed to read file\n";
+        std::cerr << "Failed to read file: procstat\n";
         return;
     }
+    #endif
 
     for (auto i = 1; i < 25; i++) {
         ifs >> line;
@@ -182,9 +182,9 @@ void Client::procstat(std::string filename, proc_data* data) const {
                     std::stringstream temp;
                     temp << line;
                     temp >> data->pid;
-                    // data->user = user_from_uid(data->pid); <- uid != pid
                     break;
                     }
+                    // trim braces from process name
             case 2: data->name = std::string(line.cbegin()+1, line.cend()-1); break;
             case 3: {
                     std::stringstream temp;
@@ -241,10 +241,12 @@ void Client::procstatus(std::string filename, proc_data* data) const {
     std::ifstream ifs(filename);
     std::string garbage;
 
+    #ifdef DEBUG
     if(!ifs.is_open()){
-        std::cerr << "couldn't open the file\n";
+        std::cerr << "couldn't open the file: procstatus\n";
         return;
     }
+    #endif
 
     for (auto i = 0; i < 9; i++) {
         garbage.clear();

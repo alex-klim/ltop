@@ -8,7 +8,7 @@
 
 size_t Ui::firstToDraw = 0;
 size_t Ui::currentLine = 0;
-size_t Ui::nCpus = std::thread::hardware_concurrency();
+size_t Ui::nCpus = std::thread::hardware_concurrency(); // this will be used as a CPU counter
 
 void Ui::set_height() {
     w_height = tb_height();
@@ -42,7 +42,6 @@ void Ui::on_exit() const {
 }
 
 void Ui::drawCpuLoad(Point start, int maxx, int load, int cpuN) const {
-    //std::cerr << "Max: " << maxx << '\n';
     tb_change_cell(start.x_, start.y_, '0'+cpuN, 151, 236);
     tb_change_cell(start.x_+3, start.y_, '[', 151, 236);
     for (auto i = start.x_+4; i < load; i++) {
@@ -83,14 +82,10 @@ void Ui::drawSeparator(int y) const {
     for (auto i = strlen(buff); i < w_width; ++i) {
         tb_change_cell(i, y, ' ', 151, 151);
     }
-    delete buff;
+    delete[] buff;
 }
 
 void Ui::drawString(Point start, std::string& msg) const {
-    //std::cerr << "===================================\n";
-    //std::cerr << "Point: (" << start.x_ << ", " << start.y_ << ")\n";
-    //std::cerr << msg <<'\n';
-    //std::cerr << "===================================\n";
     for (size_t i = 0; i < msg.length(); i++) {
         tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
     }
@@ -115,20 +110,16 @@ void Ui::drawLine(Point start, std::string& msg) const {
 }
 
 void Ui::drawSummary(Point start, double load[3], int threads, int running, ull uptime) const {
-    //std::cerr << "Point: (" << start.x_ << ", " << start.y_ << ")\n";
     std::string buf = "Tasks: " + std::to_string(threads)
         + ", " + std::to_string(running) +" running";
-    //std::cerr << buf <<'\n';
     drawString(start, buf);
     buf = "Load average: " + std::to_string(load[0]) + ", " + std::to_string(load[1])
         + ", " + std::to_string(load[2]);
-    //std::cerr << buf <<'\n';
     drawString(Point(start.x_, start.y_+1), buf);
     char cbuf[9];
     ttcs(cbuf, uptime);
     buf = "Uptime: ";
     buf += cbuf;
-    //std::cerr << buf <<'\n';
     drawString(Point(start.x_, start.y_+2), buf);
 }
 
@@ -154,7 +145,7 @@ void Ui::drawProcStat(Point start, proc_data* news) const {
             news->res, news->shr, timer, news->state, news->name.c_str());
     std::string to_render(buff);
     drawLine(start, to_render);
-    delete buff;
+    delete[] buff;
 }
 
 void Ui::drawProcList(Point start, std::vector<proc_data>& pnews) const {
@@ -166,13 +157,6 @@ void Ui::drawProcList(Point start, std::vector<proc_data>& pnews) const {
 }
 
 void Ui::drawAll(Point start, data& news, minfo& mi, std::vector<proc_data>& pnews) const {
-    /*std::cerr << news.uptime << '\n'
-        << news.idle << '\n'
-        << news.load[0] << " " << news.load[1] << " " << news.load[2] << '\n'
-        << news.usage[0] << " " << news.usage[1] << " " << news.usage[2] << " " << news.usage[3] << '\n'
-        << news.threads << '\n'
-        << news.running << '\n';*/
-
     tb_clear();
     drawStats(start, news.usage, mi);
     drawSummary(Point(w_width/2+5, start.y_),
@@ -180,30 +164,4 @@ void Ui::drawAll(Point start, data& news, minfo& mi, std::vector<proc_data>& pne
     drawSeparator(start.y_+7);
     drawProcList(Point(start.x_, start.y_+8), pnews);
     tb_present();
-}
-
-void Ui::ui_loop(data& news) {
-    set_width();
-    set_height();
-    //drawAll(Point(1,2), news);
-
-    struct tb_event ev;
-    while (tb_poll_event(&ev)) {
-        switch (ev.type) {
-            case TB_EVENT_KEY:
-                switch (ev.key) {
-                    case TB_KEY_ESC:
-                        goto done;
-                        break;
-                }
-                break;
-            case TB_EVENT_RESIZE:
-                set_height();
-                set_width();
-                //drawAll(Point(1,2), news);
-                break;
-        }
-    }
-done:
-    return;
 }

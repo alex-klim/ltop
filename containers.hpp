@@ -4,17 +4,19 @@
 #include <vector>
 #include <memory>
 
+using ull = unsigned long long;
+
+struct cpu_info {
+    ull user, nice, system, idle, iowait, irq, sirq;
+};
+
 struct proc_data {
     double pcpu, pmem;
     int pid;
     std::string user, name;
     int pri, ni, virt, res, shr, ltime;
     char state;
-
-    //proc_data(int a) : pid(a){};
 };
-
-using ull = unsigned long long;
 
 struct minfo {
     ull memtot;

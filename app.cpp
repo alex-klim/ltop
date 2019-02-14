@@ -10,42 +10,18 @@
 
 namespace fs = std::experimental::filesystem;
 
-void cpu_cpy(cpu_info* dst, cpu_info* src) {
-    for (auto i = 0; i < 9; ++i) {
-        dst[i] = src[i];
-    }
-}
+App::App() : gd(new ginfo()), md(new minfo()), cl(new Client()), ui(new Ui()) {}
 
-void calc_usage(cpu_info* lhs, cpu_info* rhs, double usage[4]) {
-    ull all;
-    ull work;
-    for (auto i = 1; i < 5; ++i) {
-        ull all = (rhs[i].user + rhs[i].system + rhs[i].nice
-                + rhs[i].idle + rhs[i].iowait + rhs[i].irq + rhs[i].sirq)
-            - (lhs[i].user + lhs[i].system + lhs[i].nice
-                + lhs[i].idle + lhs[i].iowait + lhs[i].irq + lhs[i].sirq);
-        ull work = (rhs[i].user + rhs[i].system + rhs[i].nice + rhs[i].irq + rhs[i].sirq)
-            - (lhs[i].user + lhs[i].system + lhs[i].nice + lhs[i].irq + lhs[i].sirq);
-        usage[i-1] = static_cast<double>(work)/all;
-    }
-}
+App::~App() {}
 
-App::App() : gd(new ginfo()), md(new minfo()), cl(new Client()), ui(new Ui()) {
-    gd->last = new cpu_info[9]();
-    gd->cur = new cpu_info[9]();
-}
-
-App::~App() {
-    delete gd->last;
-    delete gd->cur;
-}
-
+// collecting info on startup, so ui could show us some useful information
 void App::init() {
     ui->init();
     collect_data();
     std::this_thread::sleep_for(std::chrono::milliseconds(deltaTime));
 }
 
+// collecting data for each process
 void App::collect_proclist() {
     fs::path proc("/proc");
     pd.clear();
@@ -65,6 +41,7 @@ void App::collect_proclist() {
     }
 }
 
+// collecting processor and memory info
 void App::collect_data() {
     cpu_cpy(gd->last, gd->cur);
     cl->uptime(gd->uptime, gd->idle);
@@ -73,6 +50,25 @@ void App::collect_data() {
     cl->stat(gd->cur);
     calc_usage(gd->last, gd->cur, gd->usage);
     collect_proclist();
+}
+
+void App::draw() {
+    {
+        std::lock_guard<std::mutex> lock(d_mutex);
+        std::lock_guard<std::mutex> lock2(p_mutex);
+        data news{
+            gd->uptime,
+            gd->idle,
+            { *(gd->load), *(gd->load+1), *(gd->load+2) },
+            { *(gd->usage), *(gd->usage+1), *(gd->usage+2), *(gd->usage+3) },
+            gd->threads,
+            gd->running
+        };
+        if (Ui::currentLine >= pd.size()) {
+            Ui::currentLine = pd.size()-1;
+        }
+        ui->drawAll(Point(1,1), news, *md, pd);
+    }
 }
 
 int App::ui_loop() {
@@ -96,7 +92,8 @@ int App::ui_loop() {
                         {                   // need to backup mutex for process container
                             std::lock_guard<std::mutex> lock(p_mutex);
                             if (Ui::currentLine < pd.size()-1) {
-                                if (Ui::firstToDraw == Ui::currentLine - ui->get_height()+Ui::nCpus+6) {
+                                if (Ui::firstToDraw == Ui::currentLine
+                                        - ui->get_height()+Ui::nCpus+6) {
                                     Ui::firstToDraw++;
                                 }
                                 Ui::currentLine++;
@@ -118,6 +115,9 @@ int App::ui_loop() {
             case TB_EVENT_RESIZE:
                 ui->set_height();
                 ui->set_width();
+                if (Ui::currentLine - Ui::firstToDraw > ui->get_height()-Ui::nCpus-6) {
+                    Ui::currentLine = Ui::firstToDraw+ui->get_height()-Ui::nCpus-6;
+                }
                 draw();
                 break;
         }
@@ -127,23 +127,9 @@ done:
     return 0;
 }
 
-void App::draw() {
-    {
-        std::lock_guard<std::mutex> lock(d_mutex);
-        data news{
-            gd->uptime,
-            gd->idle,
-            { *(gd->load), *(gd->load+1), *(gd->load+2) },
-            { *(gd->usage), *(gd->usage+1), *(gd->usage+2), *(gd->usage+3) },
-            gd->threads,
-            gd->running
-        };
-        ui->drawAll(Point(1,1), news, *md, pd);
-    }
-}
-
 int App::main_loop() {
     auto f = std::async(std::launch::async, &App::ui_loop, this);
+    // client loop
     while(1) {
         {
             std::lock_guard<std::mutex> lock(d_mutex);

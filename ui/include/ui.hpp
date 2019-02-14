@@ -5,7 +5,6 @@
 
 #include <string>
 #include "../../containers.hpp"
-using ull = unsigned long long;
 
 struct data {
     ull uptime;
@@ -24,14 +23,6 @@ struct Point {
     int x_, y_;
 };
 
-/*  struct p_data {
-    double pcpu, pmem;
-    int pid;
-    std::string user, name;
-    int pri, ni, virt, res, shr, ltime;
-    char state;
-};*/
-
 class Ui {
 public:
     Ui() {};
@@ -40,16 +31,15 @@ public:
     void on_exit() const;
     void drawStats(Point, double[4], minfo&) const;
     void drawSeparator(int) const;
-    void drawProcStat(Point, proc_data*) const;
+    void drawString(Point, std::string&) const;
+    void drawLine(Point, std::string&) const;
     void drawMemUsage(Point, int, int) const;
     void drawSwpUsage(Point, int, int) const;
+    void drawProcStat(Point, proc_data*) const;
     void drawProcList(Point, std::vector<proc_data>& ) const;
     void drawCpuLoad(Point, int, int, int) const;
     void drawSummary(Point, double[3], int, int, ull) const;
-    void drawString(Point, std::string&) const;
-    void drawLine(Point, std::string&) const;
     void drawAll(Point, data&, minfo&, std::vector<proc_data>&) const;
-    void ui_loop(data&);
 
     void set_width();
     void set_height();
