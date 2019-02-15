@@ -4,7 +4,7 @@
 #include <termbox.h>
 
 #include <string>
-#include "../../containers.hpp"
+#include "containers.hpp"
 
 struct data {
     ull uptime;
