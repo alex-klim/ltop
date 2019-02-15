@@ -121,6 +121,8 @@ void Ui::drawSummary(Point start, double load[3], int threads, int running, ull 
     buf = "Uptime: ";
     buf += cbuf;
     drawString(Point(start.x_, start.y_+2), buf);
+    buf = "Press F9 to send SIGTERM to selected process";
+    drawString(Point(start.x_, start.y_+3), buf);
 }
 
 void Ui::drawStats(Point start, double usage[4], minfo& mi) const {
