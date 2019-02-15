@@ -79,7 +79,7 @@ void Ui::drawSeparator(int y) const {
     for (size_t i = 0; i < strlen(buff); i++) {
         tb_change_cell(i+1, y, buff[i], 236, 151);
     }
-    for (auto i = strlen(buff); i < w_width; ++i) {
+    for (auto i = strlen(buff)+1; i < w_width; ++i) {
         tb_change_cell(i, y, ' ', 151, 151);
     }
     delete[] buff;
