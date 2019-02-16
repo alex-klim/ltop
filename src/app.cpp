@@ -18,7 +18,6 @@ App::~App() {}
 void App::init() {
     ui->init();
     collect_data();
-    std::this_thread::sleep_for(std::chrono::milliseconds(deltaTime));
 }
 
 void App::cleanup() const {
@@ -33,10 +32,10 @@ void App::collect_proclist() {
         std::lock_guard<std::mutex> lock(p_mutex);
         if (fs::is_directory(proc)) {
             for (auto& p: fs::directory_iterator(proc)) {
-                std::string ogo(p.path().filename());
-                if (is_num(ogo)) {
+                std::string dir(p.path().filename());
+                if (is_num(dir)) {
                     pd.push_back(proc_data());
-                    std::string filename = proc.string()+'/'+ogo+"/stat";
+                    std::string filename = proc.string()+'/'+dir+"/stat";
                     cl->procstat(filename, &(pd.back()));
                     cl->procstatus(filename+"us", &(pd.back()));
                 }
