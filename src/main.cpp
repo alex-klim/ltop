@@ -8,6 +8,7 @@ int main() {
     } catch (...) {
         app.cleanup();
         std::cerr << "Something went wrong, but i dont want to mess up the terminal";
+        return 0;
     }
     return 0;
 }
