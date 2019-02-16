@@ -21,6 +21,10 @@ void App::init() {
     std::this_thread::sleep_for(std::chrono::milliseconds(deltaTime));
 }
 
+void App::cleanup() const {
+    ui->on_exit();
+}
+
 // collecting data for each process
 void App::collect_proclist() {
     fs::path proc("/proc");
@@ -123,7 +127,7 @@ int App::ui_loop() {
         }
     }
 done:
-    ui->on_exit();
+    cleanup();
     return 0;
 }
 

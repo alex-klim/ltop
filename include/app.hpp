@@ -33,6 +33,7 @@ public:
     App(const App&) = delete;
     App& operator=(const App&) = delete;
     void init();
+    void cleanup() const;
     void draw();
     void collect_data();
     void collect_proclist();
