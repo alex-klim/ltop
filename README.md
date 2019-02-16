@@ -21,5 +21,7 @@ make
 - calculating shared memory for process
 - calculating MEM% and CPU% for process
 
+### Screenshot:
+![screenshot1](/../screenshots/imgs/ltop.png?raw=true)
 
 [termbox]: https://github.com/nsf/termbox
