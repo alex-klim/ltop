@@ -6,6 +6,10 @@
 #include <thread>
 
 
+static constexpr unsigned int DARK_SEA_GREEN = 151;
+static constexpr unsigned int PALE_TURQUOISE = 159;
+static constexpr unsigned int GREY_19 = 236;
+
 size_t Ui::firstToDraw = 0;
 size_t Ui::currentLine = 0;
 size_t Ui::nCpus = std::thread::hardware_concurrency(); // this will be used as a CPU counter
@@ -42,32 +46,32 @@ void Ui::on_exit() const {
 }
 
 void Ui::drawCpuLoad(Point start, int maxx, int load, int cpuN) const {
-    tb_change_cell(start.x_, start.y_, '0'+cpuN, 151, 236);
-    tb_change_cell(start.x_+3, start.y_, '[', 151, 236);
+    tb_change_cell(start.x_, start.y_, '0'+cpuN, DARK_SEA_GREEN, GREY_19);
+    tb_change_cell(start.x_+3, start.y_, '[', DARK_SEA_GREEN, GREY_19);
     for (auto i = start.x_+4; i < load; i++) {
-        tb_change_cell(i, start.y_, '=', 151, 236);
+        tb_change_cell(i, start.y_, '=', DARK_SEA_GREEN, GREY_19);
     }
-    tb_change_cell(maxx, start.y_, ']', 151, 236);
+    tb_change_cell(maxx, start.y_, ']', DARK_SEA_GREEN, GREY_19);
 }
 
 void Ui::drawMemUsage(Point start, int maxx, int load) const {
     std::string label("Mem");
     drawString(start, label);
-    tb_change_cell(start.x_+3, start.y_, '[', 151, 236);
+    tb_change_cell(start.x_+3, start.y_, '[', DARK_SEA_GREEN, GREY_19);
     for (auto i = start.x_+4; i < load; i++) {
-        tb_change_cell(i, start.y_, '=', 151, 236);
+        tb_change_cell(i, start.y_, '=', DARK_SEA_GREEN, GREY_19);
     }
-    tb_change_cell(maxx, start.y_, ']', 151, 236);
+    tb_change_cell(maxx, start.y_, ']', DARK_SEA_GREEN, GREY_19);
 }
 
 void Ui::drawSwpUsage(Point start, int maxx, int load) const {
     std::string label("Swp");
     drawString(start, label);
-    tb_change_cell(start.x_+3, start.y_, '[', 151, 236);
+    tb_change_cell(start.x_+3, start.y_, '[', DARK_SEA_GREEN, GREY_19);
     for (auto i = start.x_+4; i < load; i++) {
-        tb_change_cell(i, start.y_, '=', 151, 236);
+        tb_change_cell(i, start.y_, '=', DARK_SEA_GREEN, GREY_19);
     }
-    tb_change_cell(maxx, start.y_, ']', 151, 236);
+    tb_change_cell(maxx, start.y_, ']', DARK_SEA_GREEN, GREY_19);
 }
 
 void Ui::drawSeparator(int y) const {
@@ -77,34 +81,34 @@ void Ui::drawSeparator(int y) const {
             "pid", "User", "PRI", "NI", "VIRT",
             "RES", "SHR", "TIME", 'S', "Process");
     for (size_t i = 0; i < strlen(buff); i++) {
-        tb_change_cell(i+1, y, buff[i], 236, 151);
+        tb_change_cell(i+1, y, buff[i], GREY_19, DARK_SEA_GREEN);
     }
     for (auto i = strlen(buff)+1; i < w_width; ++i) {
-        tb_change_cell(i, y, ' ', 151, 151);
+        tb_change_cell(i, y, ' ', DARK_SEA_GREEN, DARK_SEA_GREEN);
     }
     delete[] buff;
 }
 
 void Ui::drawString(Point start, std::string& msg) const {
     for (size_t i = 0; i < msg.length(); i++) {
-        tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
+        tb_change_cell(start.x_+i, start.y_, msg[i], DARK_SEA_GREEN, GREY_19);
     }
 }
 
 void Ui::drawLine(Point start, std::string& msg) const {
     if (start.y_ == Ui::currentLine - Ui::firstToDraw + Ui::nCpus + 5) {
         for (size_t i = 0; i < msg.length(); i++) {
-            tb_change_cell(start.x_+i, start.y_, msg[i], 236, 159);
+            tb_change_cell(start.x_+i, start.y_, msg[i], GREY_19, PALE_TURQUOISE);
         }
         for (auto i = msg.length()+1; i < w_width; ++i) {
-            tb_change_cell(i, start.y_, ' ', 159, 159);
+            tb_change_cell(i, start.y_, ' ', PALE_TURQUOISE, PALE_TURQUOISE);
         }
     } else {
         for (size_t i = 0; i < msg.length(); i++) {
-            tb_change_cell(start.x_+i, start.y_, msg[i], 151, 236);
+            tb_change_cell(start.x_+i, start.y_, msg[i], DARK_SEA_GREEN, GREY_19);
         }
         for (auto i = msg.length()+1; i < w_width; ++i) {
-            tb_change_cell(i, start.y_, ' ', 236, 236);
+            tb_change_cell(i, start.y_, ' ', GREY_19, GREY_19);
         }
     }
 }

@@ -79,7 +79,7 @@ void Client::loadavg(double& avg1, double& avg5, double& avg15, int& run, int& t
 
 }
 
-void Client::stat(std::array<cpu_info, 9>& cpus) const {
+void Client::stat(std::array<cpu_info, MAX_CORES_PLUS_ONE>& cpus) const {
     std::ifstream ifs(STAT_FILE);
     std::string line;
     int i = 0;
@@ -259,3 +259,4 @@ void Client::procstatus(std::string filename, proc_data* data) const {
     tmp >> uid;
     data->user = user_from_uid(uid);
 }
+

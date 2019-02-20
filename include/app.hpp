@@ -22,8 +22,8 @@ struct ginfo {
     double usage[4];
     int threads;
     int running;
-    std::array<cpu_info, 9> last;
-    std::array<cpu_info, 9> cur;
+    std::array<cpu_info, MAX_CORES_PLUS_ONE> last;
+    std::array<cpu_info, MAX_CORES_PLUS_ONE> cur;
 };
 
 class App {
