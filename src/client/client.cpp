@@ -13,9 +13,12 @@ static std::string LOADAVG_FILE("/proc/loadavg");
 static std::string MEMINFO_FILE("/proc/meminfo");
 
 // ============ carefully borrowed from procps =============
-#define P_G_SZ 20
-#define	HASHSIZE	64		/* power of 2 */
-#define	HASH(x)		((x) & (HASHSIZE - 1))
+static constexpr unsigned P_G_SZ = 20;
+static constexpr unsigned HASHSIZE = 64;		/* power of 2 */
+
+unsigned HASH(uid_t x) {
+    return x & (HASHSIZE - 1);
+}
 
 static struct pwbuf {
     struct pwbuf *next;
