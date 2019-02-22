@@ -67,10 +67,10 @@ void App::draw() {
             gd->threads,
             gd->running
         };
-        if (Ui::currentLine >= pd.size()) {
-            Ui::currentLine = pd.size()-1;
+        if (ui->currentLine >= pd.size()) {
+            ui->currentLine = pd.size()-1;
         }
-        ui->drawAll(Point(1,1), news, *md, pd);
+        ui->drawAll(news, *md, pd);
     }
 }
 
@@ -88,28 +88,28 @@ int App::ui_loop() {
                         goto done;
                         break;
                     case TB_KEY_F9:
-                        kill(pd[Ui::currentLine].pid, SIGTERM);
+                        kill(pd[ui->currentLine].pid, SIGTERM);
                         draw();
                         break;
                     case TB_KEY_ARROW_DOWN: // scrolling down the process list
                         {                   // need to backup mutex for process container
                             std::lock_guard<std::mutex> lock(p_mutex);
-                            if (Ui::currentLine < pd.size()-1) {
-                                if (Ui::firstToDraw == Ui::currentLine
-                                        - ui->get_height()+Ui::nCpus+6) {
-                                    Ui::firstToDraw++;
+                            if (ui->currentLine < pd.size()-1) {
+                                if (ui->firstToDraw == ui->currentLine
+                                        - (ui->get_height()-1)+ui->headerPadding+1) {
+                                    ui->firstToDraw++;
                                 }
-                                Ui::currentLine++;
+                                ui->currentLine++;
                             }
                         }
                         draw();
                         break;
                     case TB_KEY_ARROW_UP: // scrolling up the process list
-                        if (Ui::currentLine > 0) {
-                            if (Ui::currentLine == Ui::firstToDraw) {
-                                Ui::firstToDraw--;
+                        if (ui->currentLine > 0) {
+                            if (ui->currentLine == ui->firstToDraw) {
+                                ui->firstToDraw--;
                             }
-                            Ui::currentLine--;
+                            ui->currentLine--;
                         }
                         draw();
                         break;
@@ -118,8 +118,8 @@ int App::ui_loop() {
             case TB_EVENT_RESIZE:
                 ui->set_height();
                 ui->set_width();
-                if (Ui::currentLine - Ui::firstToDraw > ui->get_height()-Ui::nCpus-6) {
-                    Ui::currentLine = Ui::firstToDraw+ui->get_height()-Ui::nCpus-6;
+                if (ui->currentLine - ui->firstToDraw > (ui->get_height()-1)-ui->headerPadding-1) {
+                    ui->currentLine = ui->firstToDraw+(ui->get_height()-1)-ui->headerPadding-1;
                 }
                 draw();
                 break;

@@ -10,9 +10,13 @@ static constexpr unsigned int DARK_SEA_GREEN = 151;
 static constexpr unsigned int PALE_TURQUOISE = 159;
 static constexpr unsigned int GREY_19 = 236;
 
-size_t Ui::firstToDraw = 0;
-size_t Ui::currentLine = 0;
-size_t Ui::nCpus = std::thread::hardware_concurrency(); // this will be used as a CPU counter
+Ui::Ui() {
+    start = Point(1,1);
+    firstToDraw = 0;
+    currentLine = 0;
+    nCpus = std::thread::hardware_concurrency(); // this will be used as a CPU counter
+    headerPadding = start.y_ + 3 + nCpus;
+}
 
 void Ui::set_height() {
     w_height = tb_height();
@@ -96,7 +100,7 @@ void Ui::drawString(Point start, std::string& msg) const {
 }
 
 void Ui::drawLine(Point start, std::string& msg) const {
-    if (start.y_ == Ui::currentLine - Ui::firstToDraw + Ui::nCpus + 5) {
+    if (start.y_ == Ui::currentLine - Ui::firstToDraw + headerPadding+1) {
         for (size_t i = 0; i < msg.length(); i++) {
             tb_change_cell(start.x_+i, start.y_, msg[i], GREY_19, PALE_TURQUOISE);
         }
@@ -162,12 +166,12 @@ void Ui::drawProcList(Point start, std::vector<proc_data>& pnews) const {
     }
 }
 
-void Ui::drawAll(Point start, data& news, minfo& mi, std::vector<proc_data>& pnews) const {
+void Ui::drawAll(data& news, minfo& mi, std::vector<proc_data>& pnews) const {
     tb_clear();
     drawStats(start, news.usage, mi);
     drawSummary(Point(w_width/2+5, start.y_),
             news.load, news.threads, news.running, news.uptime);
-    drawSeparator(start.y_+7);
-    drawProcList(Point(start.x_, start.y_+8), pnews);
+    drawSeparator(headerPadding);
+    drawProcList(Point(start.x_, headerPadding+1), pnews);
     tb_present();
 }

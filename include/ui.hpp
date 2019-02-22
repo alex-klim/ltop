@@ -25,7 +25,7 @@ struct Point {
 
 class Ui {
 public:
-    Ui() {};
+    Ui();
 
     void init() const;
     void on_exit() const;
@@ -39,7 +39,7 @@ public:
     void drawProcList(Point, std::vector<proc_data>& ) const;
     void drawCpuLoad(Point, int, int, int) const;
     void drawSummary(Point, double[3], int, int, ull) const;
-    void drawAll(Point, data&, minfo&, std::vector<proc_data>&) const;
+    void drawAll(data&, minfo&, std::vector<proc_data>&) const;
 
     void set_width();
     void set_height();
@@ -48,10 +48,13 @@ public:
 private:
     int w_height;
     int w_width;
+    Point start;
 public:
-    static size_t firstToDraw;
-    static size_t currentLine;
-    static size_t nCpus;
+    unsigned int firstToDraw;
+    unsigned int currentLine;
+    unsigned int nCpus;
+    unsigned int headerPadding;
+
 };
 
 
