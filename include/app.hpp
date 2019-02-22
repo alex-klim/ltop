@@ -15,17 +15,6 @@
 
 static constexpr int deltaTime = 2000; // milliseconds
 
-struct ginfo {
-    ull uptime;
-    ull idle;
-    double load[3];
-    double usage[4];
-    int threads;
-    int running;
-    std::array<cpu_info, MAX_CORES_PLUS_ONE> last;
-    std::array<cpu_info, MAX_CORES_PLUS_ONE> cur;
-};
-
 class App {
 public:
     App();

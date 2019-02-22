@@ -59,18 +59,10 @@ void App::draw() {
     {
         std::lock_guard<std::mutex> lock(d_mutex);
         std::lock_guard<std::mutex> lock2(p_mutex);
-        data news{
-            gd->uptime,
-            gd->idle,
-            { *(gd->load), *(gd->load+1), *(gd->load+2) },
-            { *(gd->usage), *(gd->usage+1), *(gd->usage+2), *(gd->usage+3) },
-            gd->threads,
-            gd->running
-        };
         if (ui->currentLine >= pd.size()) {
             ui->currentLine = pd.size()-1;
         }
-        ui->drawAll(news, *md, pd);
+        ui->drawAll(*gd, *md, pd);
     }
 }
 

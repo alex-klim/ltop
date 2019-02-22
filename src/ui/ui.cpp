@@ -166,7 +166,7 @@ void Ui::drawProcList(Point start, std::vector<proc_data>& pnews) const {
     }
 }
 
-void Ui::drawAll(data& news, minfo& mi, std::vector<proc_data>& pnews) const {
+void Ui::drawAll(ginfo& news, minfo& mi, std::vector<proc_data>& pnews) const {
     tb_clear();
     drawStats(start, news.usage, mi);
     drawSummary(Point(w_width/2+5, start.y_),

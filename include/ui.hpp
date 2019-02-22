@@ -39,7 +39,7 @@ public:
     void drawProcList(Point, std::vector<proc_data>& ) const;
     void drawCpuLoad(Point, int, int, int) const;
     void drawSummary(Point, double[3], int, int, ull) const;
-    void drawAll(data&, minfo&, std::vector<proc_data>&) const;
+    void drawAll(ginfo&, minfo&, std::vector<proc_data>&) const;
 
     void set_width();
     void set_height();

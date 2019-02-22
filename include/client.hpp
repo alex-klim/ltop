@@ -6,8 +6,6 @@
 #include <array>
 #include "containers.hpp"
 
-static constexpr int MAX_CORES_PLUS_ONE = 9;
-
 class Client {
 public:
 
